@@ -7,6 +7,7 @@ import Alert from "./components/layouts/Alert";
 import About from "./components/pages/About";
 import axios from "axios";
 import "./App.css";
+import NotFound from "./components/pages/NotFound";
 
 const App = () => {
   const [users, setUsers] = useState([]);
@@ -61,6 +62,7 @@ const App = () => {
           <Alert alert={alert} />
           <Routes>
             <Route
+              exact
               path='/'
               element={
                 <>
@@ -74,7 +76,8 @@ const App = () => {
                 </>
               }
             />
-            <Route path='/about' element={<About />} />
+            <Route exact path='/about' element={<About />} />
+            <Route path='*' element={<NotFound />} />
           </Routes>
         </div>
       </div>
