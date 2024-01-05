@@ -1,5 +1,4 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
 import UserItem from "./UserItem";
 import Spinner from "../layouts/Spinner";
 import PropTypes from "prop-types";
@@ -10,7 +9,6 @@ const Users = ({ users, loading }) => {
   } else {
     return (
       <div style={userStyle}>
-        {users.length === 0 && <Navigate to='*' replace={true} />}
         {users.map((user) => (
           <UserItem key={user.id} user={user} />
         ))}
