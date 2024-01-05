@@ -1,25 +1,85 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/layouts/Navbar";
+import Users from "./components/users/Users";
+import Search from "./components/users/Search";
+import Alert from "./components/layouts/Alert";
+import About from "./components/pages/About";
+import axios from "axios";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `https://api.github.com/users?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_SECRET_KEY}`
+        );
+        setUsers(res.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const searchUsers = async (text) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_SECRET_KEY}`
+      );
+      setUsers(res.data.items);
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
+    setLoading(false);
+  };
+
+  const clearUsers = () => {
+    setUsers([]);
+    setLoading(false);
+  };
+
+  const showAlert = (msg, type) => {
+    setAlert({ msg, type });
+    setTimeout(() => setAlert(null), 5000);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className='App'>
+        <Navbar />
+        <div className='container'>
+          <Alert alert={alert} />
+          <Routes>
+            <Route
+              path='/'
+              element={
+                <>
+                  <Search
+                    searchUsers={searchUsers}
+                    clearUsers={clearUsers}
+                    showClear={users.length > 0}
+                    setAlert={showAlert}
+                  />
+                  <Users loading={loading} users={users} />
+                </>
+              }
+            />
+            <Route path='/about' element={<About />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
